@@ -1,6 +1,10 @@
 import { FormEvent, useState } from 'react';
+import { useRouter } from 'next/router';
+import { useAuth } from '../lib/auth';
 
 export default function LoginPage() {
+  const { login } = useAuth();
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -11,10 +15,9 @@ export default function LoginPage() {
     setError(null);
     setLoading(true);
     try {
-      // Placeholder - will be wired to real API client
-      console.log('Logging in', { email, password });
-    } catch (err) {
-      setError('Login failed');
+      await login(email, password);
+    } catch (err: any) {
+      setError(err?.message || 'Login failed');
     } finally {
       setLoading(false);
     }
@@ -24,6 +27,11 @@ export default function LoginPage() {
     <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <form onSubmit={handleSubmit} style={{ width: 320, padding: 24, border: '1px solid #ddd', borderRadius: 8 }}>
         <h1 style={{ marginBottom: 16 }}>Team Standup Tracker</h1>
+        {router.query.from && (
+          <p style={{ color: '#6b7280', fontSize: 14, marginBottom: 8 }}>
+            Please log in to continue.
+          </p>
+        )}
         {error && (
           <p style={{ color: 'red', marginBottom: 8 }}>{error}</p>
         )}
